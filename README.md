@@ -1,5 +1,7 @@
 # Automated Data Pipeline & Analytics Dashboard
 
+[![Python Tests](https://github.com/gloriavarkey/automated-data-pipeline/actions/workflows/tests.yml/badge.svg)](https://github.com/gloriavarkey/automated-data-pipeline/actions/workflows/tests.yml)
+
 A Python project that validates synthetic sales data, stores clean records
 in SQLite, and displays sales insights in an interactive Streamlit dashboard.
 
@@ -15,19 +17,32 @@ in SQLite, and displays sales insights in an interactive Streamlit dashboard.
 - Exports filtered sales as CSV.
 - Supports daily execution through Windows Task Scheduler.
 - Includes 14 automated tests.
+- GitHub Actions runs automated tests and the sample pipeline on Windows and Linux.
 
 ## Technologies
 
-Python, pandas, SQLite, Streamlit, Plotly, pytest, and Windows Task Scheduler.
+Python, pandas, SQLite, Streamlit, Plotly, pytest, Git, GitHub Actions,
+and Windows Task Scheduler.
 
 ## Run locally on Windows
 
+Clone the repository and enter the project folder:
+
 ```powershell
-py -m venv .venv
+git clone https://github.com/gloriavarkey/automated-data-pipeline.git
+cd automated-data-pipeline
+```
+
+Create an environment, install dependencies, and run the application:
+
+```powershell
+py -3.13 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 .\.venv\Scripts\python.exe pipeline.py
 .\.venv\Scripts\python.exe -m streamlit run dashboard.py
 ```
+
+Open http://localhost:8501 if the browser does not open automatically.
 
 ## Run tests
 
