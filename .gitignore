@@ -1,0 +1,19 @@
+# Python environment
+.venv/
+
+# Python and test caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Generated outputs
+data/processed/
+logs/
+*.db
+*.log
+
+# Local secrets
+.env
+
+# Editor settings
+.vscode/
