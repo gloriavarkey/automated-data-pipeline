@@ -17,3 +17,6 @@ logs/
 
 # Editor settings
 .vscode/
+
+# Local company source data
+data/private/

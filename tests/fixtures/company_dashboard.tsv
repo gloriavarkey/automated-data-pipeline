@@ -1,0 +1,6 @@
+Sale_ID	Order_Date	Customer	Customer_ID	City	Sales_Rep	Department	Product_or_Service	Quantity	Unit_Price_EUR	Unit_Cost_EUR	Discount_Percent	Gross_Sales_EUR	Net_Sales_EUR	Payment_Status	Amount_Paid_EUR	Sales_Channel	Project_Reference	Warranty_Months	Notes
+FIX-01	25/02/2025	Fixture A	FIX-C1			Plumbing	Pipe by the metre	1.5	12.40	8.10	10	18.60	16.74	Partially Paid	5.00	Phone	FIX-P1	0	Fractional unit
+FIX-01	25/02/2025	Fixture A	FIX-C1			Plumbing	Pipe by the metre	1.5	12.40	8.10	10	18.60	16.74	Partially Paid	5.00	Phone	FIX-P1	0	Fractional unit
+FIX-02	2025-03-15	Fixture B	FIX-C1	Klaipėda	Fixture rep	Firefighting	Detector	2	30.00	14.00	0	60.00	60.00	Paid	60.00	Website	FIX-P2	12	Paid in full
+FIX-03	2025-05-15	Fixture C		Vilnius	Fixture rep	Woodwork	Flooring	3	30.59	20.68	5	91.74	87.15	pending	0.00	Email	FIX-P3	0	Check rounding
+FIX-04	2025-05-16	Fixture D	FIX-C4	Vilnius	Fixture rep	Plumbing	Valve	-1	12.00	8.00	0	12.00	12.00	Pending	0.00	Phone	FIX-P4	0	Invalid quantity
