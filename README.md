@@ -23,8 +23,8 @@ sale that caused it.
 - Filters dashboard results by category and date.
 - Exports filtered sales as CSV.
 - Supports daily execution through Windows Task Scheduler.
-- Includes 20 automated tests covering the original pipeline, company imports,
-  and the Streamlit page. The tests check that reruns preserve totals and
+- Includes automated tests covering the retail and company imports, the
+  scheduled runner, and the Streamlit page. The tests check that reruns preserve totals and
   that changing a filter updates both financial figures and review counts.
 - GitHub Actions runs automated tests and the sample pipeline on Windows and Linux.
 
@@ -85,16 +85,25 @@ from net sales. Outstanding balance subtracts payments received from net sales.
 
 ## Scheduled execution
 
-`run_pipeline.bat` runs the retail pipeline (`pipeline.py`) using the project's virtual environment
-and appends output and errors to `logs/pipeline.log`.
+`run_pipeline.bat` runs the retail import and also runs the company import when
+`data/private/company_sales.csv` exists. The runner logs a skip when the company
+export is missing. It attempts each available import even if the other one fails.
+Task Scheduler receives a nonzero exit code when an import fails.
 
 Configure Windows Task Scheduler to run this file using its absolute path.
 The local demonstration uses a daily 18:00 schedule while the user is
 logged in. The computer must be awake.
 
-After updating `data/private/company_sales.csv`, run
-`.\.venv\Scripts\python.exe company_pipeline.py` from the project folder,
-then click **Reload database** on the Company Sales page.
+To try the next scheduled run immediately, use PowerShell in the project folder.
+
+```powershell
+.\run_pipeline.bat
+$LASTEXITCODE
+Get-Content .\logs\pipeline.log -Tail 15
+```
+
+Exit code `0` means every import that ran succeeded. After a company import,
+click **Reload database** on the Company Sales page to see the updated figures.
 
 ## Scope and limitations
 
