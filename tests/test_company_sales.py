@@ -61,6 +61,28 @@ def test_all_invalid_reimport_keeps_dashboard_snapshot(company_db):
     assert analytics.read_sales(company_db).net_cents.sum() == 16_389
 
 
+def test_duplicate_sale_id_header_preserves_snapshot(company_db):
+    previous_sales = analytics.read_sales(company_db)
+    with FIXTURE.open(encoding="utf-8", newline="") as source:
+        reader = csv.reader(source, delimiter="\t")
+        header, sale = next(reader), next(reader)
+    with importer.INPUT_FILE.open("w", encoding="utf-8", newline="") as export:
+        writer = csv.writer(export)
+        writer.writerow(header + ["Sale_ID"])
+        writer.writerow(sale + ["SECOND-ID"])
+
+    with pytest.raises(ValueError, match=r"Duplicate columns: \['Sale_ID'\]"):
+        importer.run_pipeline()
+    assert analytics.read_sales(company_db).equals(previous_sales)
+
+
+def test_duplicate_headers_are_reported_after_trimming(tmp_path):
+    export = tmp_path / "company.csv"
+    export.write_text("Sale_ID,Notes, Sale_ID , Notes \n", encoding="utf-8-sig")
+    with pytest.raises(ValueError, match=r"Duplicate columns: \['Notes', 'Sale_ID'\]"):
+        importer.read_sales(export)
+
+
 def test_monthly_totals_include_an_empty_month(company_db):
     sales = analytics.read_sales(company_db)
     totals = analytics.monthly_net_sales(sales, date(2025, 2, 25), date(2025, 5, 15))

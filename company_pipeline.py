@@ -1,7 +1,7 @@
 import csv
 import logging
 import sqlite3
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import datetime
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from pathlib import Path
@@ -83,7 +83,12 @@ def read_sales(path):
             raise ValueError("The input file has no header.")
 
         reader.fieldnames = [name.strip() for name in reader.fieldnames]
-        missing = set(SOURCE_COLUMNS) - set(reader.fieldnames)
+        column_counts = Counter(reader.fieldnames)
+        duplicates = sorted(name for name, count in column_counts.items() if count > 1)
+        if duplicates:
+            raise ValueError(f"Duplicate columns: {duplicates}")
+
+        missing = set(SOURCE_COLUMNS) - column_counts.keys()
         if missing:
             raise ValueError(f"Missing columns: {sorted(missing)}")
 
