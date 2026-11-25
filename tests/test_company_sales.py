@@ -83,6 +83,20 @@ def test_duplicate_headers_are_reported_after_trimming(tmp_path):
         importer.read_sales(export)
 
 
+def test_reads_semicolon_delimited_company_export(tmp_path):
+    with FIXTURE.open(encoding="utf-8", newline="") as source:
+        sale = next(csv.DictReader(source, delimiter="\t"))
+    sale["Notes"] = 'Inspect valve; use the "west" entrance, please.'
+
+    export_path = tmp_path / "company_sales.csv"
+    with export_path.open("w", encoding="utf-8-sig", newline="") as export:
+        writer = csv.DictWriter(export, fieldnames=list(sale), delimiter=";")
+        writer.writeheader()
+        writer.writerow(sale)
+
+    assert importer.read_sales(export_path) == [sale]
+
+
 def test_monthly_totals_include_an_empty_month(company_db):
     sales = analytics.read_sales(company_db)
     totals = analytics.monthly_net_sales(sales, date(2025, 2, 25), date(2025, 5, 15))
