@@ -79,6 +79,11 @@ and the €91.77 calculated from quantity and unit price.
 | Company sample included in this repository | 5 | 1 | 1 | 3 | €163.89 net sales |
 | Larger company export used locally | 188 | 4 | 0 | 184 | €252,031.58 net sales |
 
+In `data/processed/company/rejected_sales.csv`, `source_row` identifies the
+original CSV record. The header is row 1. Each record counts once, even when a
+quoted field spans multiple lines. Empty lines are skipped. Identical rejected
+records appear once at their first position. In the sample, `FIX-04` is row 6.
+
 Company totals use the recorded net amounts, including accepted sales with
 warnings. Estimated gross profit subtracts quantity times recorded unit cost
 from net sales. Outstanding balance subtracts payments received from net sales.

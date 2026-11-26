@@ -61,6 +61,27 @@ def test_all_invalid_reimport_keeps_dashboard_snapshot(company_db):
     assert analytics.read_sales(company_db).net_cents.sum() == 16_389
 
 
+def test_rejection_report_uses_original_record_numbers(company_db):
+    rows = importer.read_sales(importer.INPUT_FILE)
+    valid, invalid = rows[0], rows[-1]
+    valid["Notes"] = "Valve inspection\nReturn visit"
+
+    with importer.INPUT_FILE.open("w", encoding="utf-8", newline="") as export:
+        writer = csv.DictWriter(export, fieldnames=importer.SOURCE_COLUMNS)
+        writer.writeheader()
+        writer.writerow(valid)
+        export.write("\r\n")
+        writer.writerows([valid, invalid, invalid])
+
+    importer.run_pipeline()
+    report_path = company_db.parent / "rejected_sales.csv"
+    with report_path.open(encoding="utf-8-sig", newline="") as report:
+        issues = list(csv.DictReader(report))
+    assert issues == [
+        {**invalid, "source_row": "4", "rejection_reason": "Quantity must be positive"}
+    ]
+
+
 def test_duplicate_sale_id_header_preserves_snapshot(company_db):
     previous_sales = analytics.read_sales(company_db)
     with FIXTURE.open(encoding="utf-8", newline="") as source:

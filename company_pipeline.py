@@ -111,11 +111,12 @@ def clean_company_sales(rows):
     unique_rows = []
     seen = set()
 
-    for row in rows:
+    # Count CSV records before deduplication. The header is row 1.
+    for source_row, row in enumerate(rows, start=2):
         signature = tuple(row[column] for column in SOURCE_COLUMNS)
         if signature not in seen:
             seen.add(signature)
-            unique_rows.append(row)
+            unique_rows.append((source_row, row))
 
     duplicate_count = len(rows) - len(unique_rows)
 
@@ -123,7 +124,7 @@ def clean_company_sales(rows):
     sale_id_counts = defaultdict(int)
     customer_names = defaultdict(set)
 
-    for row in unique_rows:
+    for _, row in unique_rows:
         sale_id_counts[row["Sale_ID"].strip()] += 1
         customer_id = row["Customer_ID"].strip()
         customer = row["Customer"].strip()
@@ -139,7 +140,7 @@ def clean_company_sales(rows):
         "Amount_Paid_EUR",
     ]
 
-    for original in unique_rows:
+    for source_row, original in unique_rows:
         row = {key: value.strip() for key, value in original.items()}
         errors = []
         warnings = []
@@ -189,6 +190,7 @@ def clean_company_sales(rows):
             rejected.append({
                 **original,
                 "rejection_reason": "; ".join(errors),
+                "source_row": source_row,
             })
             continue
 
@@ -299,7 +301,7 @@ def run_pipeline():
     write_report(
         OUTPUT_DIR / "rejected_sales.csv",
         rejected,
-        SOURCE_COLUMNS + ["rejection_reason"],
+        SOURCE_COLUMNS + ["rejection_reason", "source_row"],
     )
     write_report(
         OUTPUT_DIR / "review_sales.csv",
