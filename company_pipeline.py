@@ -1,3 +1,4 @@
+import argparse
 import csv
 import logging
 import sqlite3
@@ -291,10 +292,11 @@ def save_database(rows):
         )
 
 
-def run_pipeline():
+def run_pipeline(input_file=None):
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    rows = read_sales(INPUT_FILE)
+    source = INPUT_FILE if input_file is None else Path(input_file)
+    rows = read_sales(source)
     accepted, rejected, duplicates = clean_company_sales(rows)
     review_rows = [row for row in accepted if row["quality_warnings"]]
 
@@ -328,8 +330,14 @@ def run_pipeline():
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Import a company sales export.")
+    parser.add_argument(
+        "--input", metavar="FILE",
+        help="Path to the export (default: data/private/company_sales.csv).",
+    )
+    args = parser.parse_args()
     try:
-        run_pipeline()
+        run_pipeline(args.input)
     except Exception:
         logger.exception("Company pipeline failed.")
         raise

@@ -43,7 +43,7 @@ cd automated-data-pipeline
 ```
 
 In the project folder, set up Python 3.13 and build the two sample databases.
-The company importer accepts tab-separated or comma-separated exports.
+The company importer accepts comma-, tab-, and semicolon-separated exports.
 
 ```powershell
 py -3.13 -m venv .venv
@@ -64,6 +64,14 @@ Open http://localhost:8501 if the browser does not open automatically. Choose
 **Woodwork** to see one accepted sale for **€87.15**. Under **Data quality**,
 select **Gross sales mismatch** to inspect its €91.74 recorded gross amount
 and the €91.77 calculated from quantity and unit price.
+
+To choose a company export for one run, pass its path with `--input`. Relative
+paths start in your current directory. A successful import refreshes the usual
+company database and reports. The scheduled run uses `data/private/company_sales.csv`.
+
+```powershell
+.\.venv\Scripts\python.exe company_pipeline.py --input "$env:USERPROFILE\Downloads\November sales.csv"
+```
 
 ## Run tests
 

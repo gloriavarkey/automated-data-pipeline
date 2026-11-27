@@ -1,6 +1,8 @@
 """Exercise the company importer and the Streamlit page using a temporary database."""
 
 import csv
+import subprocess
+import sys
 from datetime import date
 from pathlib import Path
 from shutil import copyfile
@@ -33,6 +35,27 @@ def company_db(tmp_path, monkeypatch):
 def metrics(app):
     assert not app.exception
     return {widget.label: widget.value for widget in app.metric}
+
+
+def test_company_command_accepts_selected_input(tmp_path):
+    script = tmp_path / "company_pipeline.py"
+    copyfile(importer.__file__, script)
+    default_export = tmp_path / "data/private/company_sales.csv"
+    default_export.parent.mkdir(parents=True)
+    default_export.write_text("unused header\n", encoding="utf-8")
+    exports = tmp_path / "exports"
+    exports.mkdir()
+    export = exports / "November sales.tsv"
+    copyfile(FIXTURE, export)
+
+    subprocess.run(
+        [sys.executable, str(script), "--input", export.name],
+        cwd=exports, check=True, timeout=30,
+    )
+    sales = analytics.read_sales(tmp_path / "data/processed/company/company_sales.db")
+    assert sales.sale_id.tolist() == ["FIX-01", "FIX-02", "FIX-03"]
+    assert sales.net_cents.sum() == 16_389
+    assert default_export.read_text(encoding="utf-8") == "unused header\n"
 
 
 def test_repeat_import_preserves_amounts_and_excludes_invalid_rows(company_db):
